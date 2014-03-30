@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 )
 
-//var result map[string]*FileInfo
-
 type FileInfo struct {
 	size  int64
 	hash  string
@@ -68,7 +66,7 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	// that means it's not in the result set
 	if fi.hash == "" {
 		fi.hash, err = Hash(fi.paths[0])
-		if err!= nil {
+		if err != nil {
 			return err
 		}
 
@@ -77,7 +75,7 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 
 	// hash the file at this path and add it to the set.
 	hashstr, err := Hash(path)
-	if err!= nil {
+	if err != nil {
 		return err
 	}
 
@@ -91,13 +89,17 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	return nil
 }
 
+func visitor(sizemap map[int64]*FileInfo, result map[string]*FileInfo) func(string, os.FileInfo, error) error {
+	return func(path string, f os.FileInfo, err error) error {
+		return visit(path, f, result, sizemap, err)
+	}
+}
+
 func walk(root string, result map[string]*FileInfo) {
 
 	sizemap := make(map[int64]*FileInfo)
 
-	err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
-		return visit(path, f, result, sizemap, err)
-	})
+	err := filepath.Walk(root, visitor(sizemap, result))
 	if err != nil {
 		fmt.Printf("Trouble walking the file system: %s\n", err)
 	}
@@ -111,7 +113,7 @@ func main() {
 	for _, root := range flag.Args() {
 		walk(root, result)
 	}
-
+	fmt.Println("")
 	for hash, fi := range result {
 		if len(fi.paths) == 1 {
 			continue
