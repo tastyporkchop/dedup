@@ -67,7 +67,8 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	if fi.hash == "" {
 		fi.hash, err = Hash(fi.paths[0])
 		if err != nil {
-			return err
+			fmt.Printf("%v\n", err)
+			return nil
 		}
 
 		result[fi.hash] = fi
@@ -76,7 +77,8 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	// hash the file at this path and add it to the set.
 	hashstr, err := Hash(path)
 	if err != nil {
-		return err
+		fmt.Printf("%v\n", err)
+		return nil
 	}
 
 	if fi, ok := result[hashstr]; !ok {
@@ -89,7 +91,7 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	return nil
 }
 
-func visitor(sizemap map[int64]*FileInfo, result map[string]*FileInfo) func(string, os.FileInfo, error) error {
+func visitor(sizemap map[int64]*FileInfo, result map[string]*FileInfo) filepath.WalkFunc {
 	return func(path string, f os.FileInfo, err error) error {
 		return visit(path, f, result, sizemap, err)
 	}
