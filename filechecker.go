@@ -28,7 +28,7 @@ func Hash(path string) (string, error) {
 	}()
 
 	h := md5.New()
-	buf := make([]byte, 1024)
+	buf := make([]byte, 4096)
 	for {
 		n, err := file.Read(buf)
 		if err != nil && err != io.EOF {
