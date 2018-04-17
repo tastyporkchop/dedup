@@ -84,7 +84,7 @@ func visit(path string, f os.FileInfo, result map[string]*FileInfo, sizeinfo map
 	if fi, ok := result[hashstr]; !ok {
 		result[hashstr] = &FileInfo{f.Size(), hashstr, []string{path}}
 	} else {
-		fmt.Print("O")
+		//fmt.Print("O")
 		fi.paths = append(fi.paths, path)
 	}
 
@@ -115,6 +115,7 @@ func main() {
 	for _, root := range flag.Args() {
 		walk(root, result)
 	}
+
 	fmt.Println("")
 	for hash, fi := range result {
 		if len(fi.paths) == 1 {
